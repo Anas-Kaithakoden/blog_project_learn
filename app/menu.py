@@ -1,4 +1,6 @@
-from app.crud import (create_user , list_users, view_user, update_user, delete_user, create_post, list_posts, view_post, update_post, delete_post)
+from app.crud import (create_user , list_users, view_user, update_user, delete_user,
+                       create_post, list_posts, view_post, update_post, delete_post, 
+                       add_comment, view_comments, upodate_comment, delete_comment)
 
 
 def user_management():
@@ -156,6 +158,77 @@ def post_management():
             case _:
                 print("Please choose a right option")
 
+def comment_managemnet():
+    while True:
+        print("""===== COMMENT MENU =====
+
+    1. Add comment to a post
+    2. View comments of a post
+    3. Update comment
+    4. Delete comment
+    5. Back""")
+        
+        choice = input("Enter: ")
+        match choice:
+            case "5":
+                break
+            case "1":
+                try:
+                    user_id = int(input("Enter user ID: "))
+                except ValueError:
+                    print("User ID must be a number.")
+                    continue              
+                try:
+                    post_id = int(input("Enter post ID: "))
+                except ValueError:
+                    print("Post ID must be a number.")
+                    continue
+                comment = input("Enter comment: ")
+
+                commented = add_comment(user_id, post_id, comment)
+
+                if commented:
+                    print(f"Comment successfully added: {commented.content}")
+                else:
+                    print("Comment Failed")
+            case "2":
+                try:
+                    post_id = int(input("Enter post ID: "))
+                except ValueError:
+                    print("Post ID must be a number.")
+                    continue
+                comments = view_comments(post_id)
+                if comments:
+                    for comment in comments:
+                        print(f"Post:{comment.post.title}\nOwner: {comment.user.name}\nComment: { comment.content}\nComment ID: {comment.id}\n")
+                else:
+                    print("Post not found")
+            case "3":
+                try:
+                    comment_id = int(input("Enter comment ID: "))
+                except ValueError:
+                    print("Comment ID must be a number.")
+                    continue
+                new_comment = input("Enter new comment: ")
+                update = upodate_comment(comment_id, new_comment)
+                if update:
+                    print(f"Comment edited successfully: {update.content}")
+                else:
+                    print(" Comment does not exist")
+            case "4":
+                try:
+                    comment_id = int(input("Enter comment ID: "))
+                except ValueError:
+                    print("Comment ID must be a number.")
+                    continue
+                comment = delete_comment(comment_id)
+                if comment:
+                    print("Comment deleted successfully")
+                else:
+                    print("Comment deletion failed, Comment not found")
+            case _:
+                print("Please choose a right option")
+
 
 
 def run_menu():
@@ -175,6 +248,8 @@ def run_menu():
                 user_management()
             case "2":
                 post_management()
+            case "3":
+                comment_managemnet()
             case _:
                 print("Please choose a right option")
 

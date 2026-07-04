@@ -1,8 +1,8 @@
 
 from app.database import SessionLocal
-from app.models import User, Post
+from app.models import User, Post, Comment
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 
 def create_user(name, email):
@@ -89,5 +89,49 @@ def delete_post(post_id):
             session.delete(existing_post)
             session.commit()
             return existing_post
+        else:
+            return None  
+        
+def add_comment(user_id, post_id, comment):
+    with SessionLocal() as session:
+        user = session.scalar(select(User).where(User.id == user_id))
+        if not user:
+            return None
+        post = session.scalar(select(Post).where(Post.id == post_id))
+        if not post:
+            return None 
+        
+        comment = Comment(content=comment, user_id=user_id, post_id=post_id)
+        session.add(comment)
+        session.commit()
+        session.refresh(comment)
+
+        return comment
+
+def view_comments(post_id):
+    with SessionLocal() as session: 
+        return session.scalars(select(Comment).where(Comment.post_id == post_id).options(joinedload(Comment.user), joinedload(Comment.post))).all()
+        # post = session.scalars(select(Post).where(Post.id==post_id).options(joinedload(Post.user), selectinload(Post.comments).joinedload(Comment.user))).all()
+
+
+def upodate_comment(comment_id, new_comment):
+    with SessionLocal() as session:
+        comment = session.scalar(select(Comment).where(Comment.id == comment_id)) 
+        if not comment:
+            return None
+
+        comment.content = new_comment
+        session.commit()
+        session.refresh(comment)
+
+        return comment
+
+def delete_comment(comment_id):
+    with SessionLocal() as session:
+        existing_comment = session.scalar(select(Comment).where(Comment.id == comment_id))
+        if existing_comment:
+            session.delete(existing_comment)
+            session.commit()
+            return existing_comment
         else:
             return None  
