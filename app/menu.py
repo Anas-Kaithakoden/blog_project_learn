@@ -1,6 +1,7 @@
 from app.crud import (create_user , list_users, view_user, update_user, delete_user,
                        create_post, list_posts, view_post, update_post, delete_post, 
-                       add_comment, view_comments, upodate_comment, delete_comment)
+                       add_comment, view_comments, upodate_comment, delete_comment,
+                       show_posts_by_user, show_comments_of_post)
 
 
 def user_management():
@@ -230,6 +231,54 @@ def comment_managemnet():
                 print("Please choose a right option")
 
 
+def special_functions():
+    while True:
+        print("""===== COMMENT MENU =====
+
+    1. Show all posts by a user
+    2. Show all comments for a post
+    3. Count posts written by every user
+    4. Delete comment
+    5. Back""")
+        
+        choice = input("Enter: ")
+        match choice:
+            case "5":
+                break
+            case "1":
+                try:
+                    user_id = int(input("Enter user ID: "))
+                except ValueError:
+                    print("User ID must be a number.")
+                    continue                 
+                posts = show_posts_by_user(user_id)
+                if posts:
+                    print("-" * 75)
+                    print(f"{'POST ID':<5} | {'POST TITLE'}")
+                    print("-" * 75)
+                    for post in posts:
+                        print(f"{post.id:<5} | {post.title}")
+                    print("-" * 75)
+                else:
+                    print("User does not exist")
+            case "2":
+                try:
+                    post_id = int(input("Enter post ID: "))
+                except ValueError:
+                    print("Post ID must be a number.")
+                    continue
+                comments = show_comments_of_post(post_id)
+                if comments:
+                    print("-" * 75)
+                    print(f"{'COMMENT ID':<5} {'COMMENT CONTENT':<25} {'COMMENT OWNER':<20} {'POST TITLE'}")
+                    print("-" * 75)
+                    for comment in comments:
+                        print(f"{comment.id:<5} {comment.content:<25} {comment.user.name:<30} {comment.post.title}")
+                    print("-" * 75)
+                else:
+                    print("Post not found") 
+                        
+
 
 def run_menu():
     while True:
@@ -237,11 +286,12 @@ def run_menu():
     1. User Management
     2. Post Management
     3. Comment Management
-    4. Exit""")
+    4. Special functions
+    5. Exit""")
         
         management = input("Enter: ")
         match management:
-            case "4":
+            case "5":
                 print("Program exited...")
                 break
             case "1":
@@ -250,6 +300,8 @@ def run_menu():
                 post_management()
             case "3":
                 comment_managemnet()
+            case "4":
+                special_functions()
             case _:
                 print("Please choose a right option")
 

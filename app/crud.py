@@ -111,8 +111,6 @@ def add_comment(user_id, post_id, comment):
 def view_comments(post_id):
     with SessionLocal() as session: 
         return session.scalars(select(Comment).where(Comment.post_id == post_id).options(joinedload(Comment.user), joinedload(Comment.post))).all()
-        # post = session.scalars(select(Post).where(Post.id==post_id).options(joinedload(Post.user), selectinload(Post.comments).joinedload(Comment.user))).all()
-
 
 def upodate_comment(comment_id, new_comment):
     with SessionLocal() as session:
@@ -135,3 +133,11 @@ def delete_comment(comment_id):
             return existing_comment
         else:
             return None  
+        
+def show_posts_by_user(user_id):
+    with SessionLocal() as session:
+        return session.scalars(select(Post).where(Post.user_id == user_id).options(joinedload(Post.user))).all()
+    
+def show_comments_of_post(post_id):
+    with SessionLocal() as session:
+        return session.scalars(select(Comment).where(Comment.post_id == post_id).options(joinedload(Comment.user), joinedload(Comment.post))).all()
