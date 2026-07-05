@@ -1,7 +1,7 @@
 from app.crud import (create_user , list_users, view_user, update_user, delete_user,
                        create_post, list_posts, view_post, update_post, delete_post, 
                        add_comment, view_comments, upodate_comment, delete_comment,
-                       show_posts_by_user, show_comments_of_post)
+                       show_posts_by_user, show_comments_of_post, count_posts_written_by_every_user)
 
 
 def user_management():
@@ -276,7 +276,17 @@ def special_functions():
                         print(f"{comment.id:<5} {comment.content:<25} {comment.user.name:<30} {comment.post.title}")
                     print("-" * 75)
                 else:
-                    print("Post not found") 
+                    print("Post not found")
+            case "3":
+                results = count_posts_written_by_every_user()
+
+                print("-" * 35)
+                print(f"{'USER':<20}{'POSTS'}")
+                print("-" * 35)
+
+                for name, count in results:
+                    print(f"{name:<20}{count}")                             
+                
                         
 
 

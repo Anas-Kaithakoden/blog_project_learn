@@ -1,7 +1,7 @@
 
 from app.database import SessionLocal
 from app.models import User, Post, Comment
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import joinedload, selectinload
 
 
@@ -141,3 +141,7 @@ def show_posts_by_user(user_id):
 def show_comments_of_post(post_id):
     with SessionLocal() as session:
         return session.scalars(select(Comment).where(Comment.post_id == post_id).options(joinedload(Comment.user), joinedload(Comment.post))).all()
+
+def count_posts_written_by_every_user():
+        with SessionLocal() as session:
+            return session.execute(select(User.name, func.count(Post.id)).outerjoin(Post).group_by(User.name)).all()
