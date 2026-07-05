@@ -1,7 +1,8 @@
 from app.crud import (create_user , list_users, view_user, update_user, delete_user,
                        create_post, list_posts, view_post, update_post, delete_post, 
                        add_comment, view_comments, upodate_comment, delete_comment,
-                       show_posts_by_user, show_comments_of_post, count_posts_written_by_every_user)
+                       show_posts_by_user, show_comments_of_post, count_posts_written_by_every_user, count_comments_for_every_post,
+                       show_latest_posts, seed_database)
 
 
 def user_management():
@@ -238,12 +239,13 @@ def special_functions():
     1. Show all posts by a user
     2. Show all comments for a post
     3. Count posts written by every user
-    4. Delete comment
-    5. Back""")
+    4. Count comments for every post
+    5. Show latest 5 posts
+    6. Back""")
         
         choice = input("Enter: ")
         match choice:
-            case "5":
+            case "6":
                 break
             case "1":
                 try:
@@ -286,8 +288,34 @@ def special_functions():
 
                 for name, count in results:
                     print(f"{name:<20}{count}")                             
-                
-                        
+            case "4":
+                results = count_comments_for_every_post()
+
+                print("-" * 35)
+                print(f"{'TITLE':<20}{'COMMENTS'}")
+                print("-" * 35)
+
+                for title, count in results:
+                    print(f"{title:<20}{count}")   
+            case "5":
+                while(True):
+                    print("[Enter NA to exit]")                
+                    try:
+                        page = int(input("Enter page Number: "))
+                    except ValueError:
+                        break
+
+                    posts = show_latest_posts(page)
+
+                    print("-" * 35)
+                    print(f"{'ID':<10}{'TITLE':<20}{'CONTENT'}")
+                    print("-" * 35)
+
+                    for post in posts:
+                        print(f"{post.id:<10}{post.title:<20}{post.content}")
+                    print("-" * 35)
+            case "7":
+                seed_database()
 
 
 def run_menu():

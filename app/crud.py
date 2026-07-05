@@ -143,5 +143,107 @@ def show_comments_of_post(post_id):
         return session.scalars(select(Comment).where(Comment.post_id == post_id).options(joinedload(Comment.user), joinedload(Comment.post))).all()
 
 def count_posts_written_by_every_user():
-        with SessionLocal() as session:
-            return session.execute(select(User.name, func.count(Post.id)).outerjoin(Post).group_by(User.name)).all()
+    with SessionLocal() as session:
+        return session.execute(select(User.name, func.count(Post.id)).outerjoin(Post).group_by(User.name)).all()
+        
+def count_comments_for_every_post():
+    with SessionLocal() as session:
+        return session.execute(select(Post.title, func.count(Comment.id)).outerjoin(Comment).group_by(Post.title)).all()
+    
+def show_latest_posts(page, per_page=5):
+    with SessionLocal() as session:   
+        return session.scalars(select(Post).order_by(Post.created_at.desc()).offset((page-1)*per_page).limit(per_page)).all()
+    
+
+
+from random import choice, randint
+def seed_database():
+    with SessionLocal() as session:
+
+        users = []
+
+        names = [
+            "Anas", "Alice", "John", "Sarah", "David",
+            "Emma", "Michael", "Sophia", "James", "Olivia"
+        ]
+
+        for name in names:
+            user = User(
+                name=name,
+                email = f"{name.lower()}{randint(1000,9999)}@example.com"
+            )
+            session.add(user)
+            users.append(user)
+
+        session.commit()
+
+        posts = []
+
+        titles = [
+            "Learning SQLAlchemy",
+            "FastAPI Basics",
+            "Python Tips",
+            "Docker Guide",
+            "Linux Commands",
+            "REST APIs",
+            "ORM vs Raw SQL",
+            "Database Indexes",
+            "JWT Authentication",
+            "Testing with Pytest",
+        ]
+
+        contents = [
+            "This is my first blog post.",
+            "Today I learned something new.",
+            "Python is fun to use.",
+            "Docker makes deployment easier.",
+            "SQLAlchemy ORM is powerful.",
+            "FastAPI is extremely fast.",
+            "Always write clean code.",
+            "Indexes improve query performance.",
+            "Authentication is important.",
+            "Testing saves time.",
+        ]
+
+        for i in range(10):
+            post = Post(
+                title=titles[i],
+                content=contents[i],
+                published=choice([True, False]),
+                user_id=choice(users).id,
+            )
+            session.add(post)
+            posts.append(post)
+
+        session.commit()
+
+        comments = [
+            "Great post!",
+            "Very helpful.",
+            "I learned a lot.",
+            "Thanks for sharing.",
+            "Excellent explanation.",
+            "Can you write Part 2?",
+            "Nice article.",
+            "This solved my problem.",
+            "Well written.",
+            "Awesome!",
+            "Interesting.",
+            "Good work.",
+            "Loved this.",
+            "Keep posting.",
+            "Very informative.",
+        ]
+
+        for _ in range(30):
+            comment = Comment(
+                content=choice(comments),
+                user_id=choice(users).id,
+                post_id=choice(posts).id,
+            )
+            session.add(comment)
+
+        session.commit()
+
+        print("Database seeded successfully!")
+        
