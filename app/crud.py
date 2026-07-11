@@ -21,13 +21,13 @@ def list_users():
     with SessionLocal() as session:
         return session.scalars(select(User)).all()
 
-def view_user(email):
+def view_user(id):
     with SessionLocal() as session:
-        return session.scalar(select(User).where(User.email == email))
+        return session.scalar(select(User).where(User.id == id))
     
-def update_user(email, name):
+def update_user(id, name):
     with SessionLocal() as session:
-        existing_user = session.scalar(select(User).where(User.email == email))
+        existing_user = session.scalar(select(User).where(User.id == id))
         if existing_user:
             existing_user.name = name
             session.commit()
@@ -36,9 +36,9 @@ def update_user(email, name):
         else:
             return None   
         
-def delete_user(email):
+def delete_user(id):
     with SessionLocal() as session:
-        existing_user = session.scalar(select(User).where(User.email == email))
+        existing_user = session.scalar(select(User).where(User.id == id))
         if existing_user:
             session.delete(existing_user)
             session.commit()
