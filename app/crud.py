@@ -112,7 +112,7 @@ def view_comments(post_id):
     with SessionLocal() as session: 
         return session.scalars(select(Comment).where(Comment.post_id == post_id).options(joinedload(Comment.user), joinedload(Comment.post))).all()
 
-def upodate_comment(comment_id, new_comment):
+def update_comment(comment_id, new_comment):
     with SessionLocal() as session:
         comment = session.scalar(select(Comment).where(Comment.id == comment_id)) 
         if not comment:

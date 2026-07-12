@@ -1,6 +1,6 @@
 from app.crud import (create_user , list_users, view_user, update_user, delete_user,
                        create_post, list_posts, view_post, update_post, delete_post, 
-                       add_comment, view_comments, upodate_comment, delete_comment,
+                       add_comment, view_comments, update_comment, delete_comment,
                        show_posts_by_user, show_comments_of_post, count_posts_written_by_every_user, count_comments_for_every_post,
                        show_latest_posts, seed_database)
 
@@ -212,7 +212,7 @@ def comment_managemnet():
                     print("Comment ID must be a number.")
                     continue
                 new_comment = input("Enter new comment: ")
-                update = upodate_comment(comment_id, new_comment)
+                update = update_comment(comment_id, new_comment)
                 if update:
                     print(f"Comment edited successfully: {update.content}")
                 else:

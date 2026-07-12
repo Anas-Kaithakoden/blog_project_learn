@@ -22,6 +22,11 @@ class PostUpdate(BaseModel):
     title: Optional[str] = Field(default=None, min_length=3)
     content: Optional[str] = Field(default=None, min_length=3)
 
+class CommentCreate(BaseModel):
+    comment: str
+
+class CommentUpdate(BaseModel):
+    comment: str
 
 @app.get("/")
 def home():
@@ -132,3 +137,50 @@ def delete_post(post_id: int):
     return post 
 
 # comments
+@app.post("/users/{user_id}/posts/{post_id}/comments")
+def add_comment(user_id: int, post_id: int, comment: CommentCreate):
+    created_comment = crud.add_comment(user_id, post_id, comment.comment)
+
+    if not created_comment:
+        raise HTTPException(
+            status_code=404,
+            detail="Post not found"
+        )
+    return created_comment 
+
+@app.get("/comments")
+def list_comments():
+    return crud.list_comments()
+
+@app.get("/posts/{post_id}/comments") # get comments of a post
+def view_comments(post_id: int):
+    post = crud.view_comments(post_id)
+    
+    if not post:
+        raise HTTPException(
+            status_code=404,
+            detail="Post not found"
+        )
+    return post
+
+@app.patch("/comments/{comment_id}")
+def update_comment(comment_id: int, comment: CommentUpdate):
+    updated_comment = crud.update_comment(comment_id, comment.comment)
+
+    if not updated_comment:
+        raise HTTPException(
+            status_code=404,
+            detail="Comment not found"
+        )
+    return updated_comment
+
+@app.delete("/comments/{comment_id}")
+def delete_comment(comment_id: int):
+    comment = crud.delete_comment(comment_id)
+
+    if not comment:
+        raise HTTPException(
+            status_code=404,
+            detail="Comment not found"
+        )
+    return comment 
