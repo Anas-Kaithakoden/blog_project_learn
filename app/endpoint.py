@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from app import crud
 from typing import Optional
+from datetime import datetime
 
 app = FastAPI(title="Blog API")
 
@@ -27,6 +28,30 @@ class CommentCreate(BaseModel):
 
 class CommentUpdate(BaseModel):
     comment: str
+
+class UserBasic(BaseModel):
+    id: int
+    name: str
+
+    model_config = {
+        "from_attributes": True
+    }
+
+class PostResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    published: bool
+    created_at: datetime
+    category: str | None
+    user_id: int
+
+    user: UserBasic
+
+    model_config = {
+        "from_attributes": True
+    }
+
 
 @app.get("/")
 def home():
@@ -103,6 +128,10 @@ def create_post(user_id: int, post: PostCreate):
 def list_posts():
     return crud.list_posts()
 
+@app.get("/posts/latest")
+def show_latest_posts(page:int = 1, per_page:int = 5):
+    return crud.show_latest_posts(page, per_page)
+
 @app.get("/posts/{post_id}")
 def view_post(post_id: int):
     post = crud.view_post(post_id)
@@ -148,10 +177,6 @@ def add_comment(user_id: int, post_id: int, comment: CommentCreate):
         )
     return created_comment 
 
-@app.get("/comments")
-def list_comments():
-    return crud.list_comments()
-
 @app.get("/posts/{post_id}/comments") # get comments of a post
 def view_comments(post_id: int):
     post = crud.view_comments(post_id)
@@ -184,3 +209,18 @@ def delete_comment(comment_id: int):
             detail="Comment not found"
         )
     return comment 
+
+# special
+
+@app.get("/users/{user_id}/posts", response_model=list[PostResponse])
+def show_posts_by_user(user_id: int):
+    return crud.show_posts_by_user(user_id)
+
+@app.get("/analytics/users/posts")
+def count_posts_written_by_every_user():
+    return crud.count_posts_written_by_every_user()
+
+@app.get("/analytics/posts/comments")
+def count_comments_for_every_post():
+    return crud.count_comments_for_every_post()
+

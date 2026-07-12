@@ -144,11 +144,25 @@ def show_comments_of_post(post_id):
 
 def count_posts_written_by_every_user():
     with SessionLocal() as session:
-        return session.execute(select(User.name, func.count(Post.id)).outerjoin(Post).group_by(User.name)).all()
+        result = session.execute(select(User.name, func.count(Post.id).label("post_count")).outerjoin(Post).group_by(User.name)).all()
+        return [
+            {
+                "name": row.name,
+                "post_count": row.post_count
+            }
+            for row in result
+        ]
         
 def count_comments_for_every_post():
     with SessionLocal() as session:
-        return session.execute(select(Post.title, func.count(Comment.id)).outerjoin(Comment).group_by(Post.title)).all()
+        result =  session.execute(select(Post.title, func.count(Comment.id).label("comment_count")).outerjoin(Comment).group_by(Post.title)).all()
+        return [
+            {
+                "post": row.title,
+                "comment_count": row.comment_count
+            }
+            for row in result
+        ]
     
 def show_latest_posts(page, per_page=5):
     with SessionLocal() as session:   
