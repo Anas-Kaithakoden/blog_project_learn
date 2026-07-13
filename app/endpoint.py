@@ -10,6 +10,7 @@ class UserCreate(BaseModel):
     name: str
     email: str
     phone: Optional[str] = None
+    password: str
 
 class UserUpdate(BaseModel):
     name: str
@@ -62,7 +63,7 @@ def home():
 @app.post("/users")
 def create_user(user: UserCreate):
 
-    created_user = crud.create_user(user.name,user.email)
+    created_user = crud.create_user(name=user.name, email=user.email, password=user.password, phone=user.phone)
 
     if not created_user:
         raise HTTPException(

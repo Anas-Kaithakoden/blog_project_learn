@@ -10,6 +10,7 @@ class User(Base):
     name:Mapped[str] = mapped_column(String(225), nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True)
     phone: Mapped[str] = mapped_column(String(20), nullable=True)
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False) 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda :datetime.now(timezone.utc))
     posts: Mapped[list["Post"]] = relationship( back_populates="user")
     comments: Mapped[list["Comment"]] = relationship(back_populates="user")

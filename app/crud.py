@@ -3,15 +3,17 @@ from app.database import SessionLocal
 from app.models import User, Post, Comment
 from sqlalchemy import select, func
 from sqlalchemy.orm import joinedload, selectinload
+from app.security import hash_password, verify_password
 
 
-def create_user(name, email):
+def create_user(name, email, password, phone):
     with SessionLocal() as session:
 
         existing_email = session.scalar(select(User).where(User.email == email))
         if existing_email:
             return None
-        user = User(name=name, email=email)
+        hashed_password = hash_password(password)
+        user = User(name=name, email=email, phone=phone, hashed_password=hashed_password)
         session.add(user)
         session.commit()
         session.refresh(user)
