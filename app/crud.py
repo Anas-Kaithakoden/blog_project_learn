@@ -6,9 +6,20 @@ from sqlalchemy.orm import joinedload, selectinload, Session
 from app.security import hash_password, verify_password
 
 
+def authenticate_user(email: str, password: str, session: Session):
+    existing_user = session.scalar(select(User).where(User.email == email))
+    if not existing_user:
+        return None
+    
+    verified = verify_password(password, existing_user.hashed_password)
+    if not verified:
+        return None
+    return existing_user
+
+
 def create_user(name, email, password, phone, session: Session):
-    existing_email = session.scalar(select(User).where(User.email == email))
-    if existing_email:
+    existing_user = session.scalar(select(User).where(User.email == email))
+    if existing_user:
         return None
     hashed_password = hash_password(password)
     user = User(name=name, email=email, phone=phone, hashed_password=hashed_password)
