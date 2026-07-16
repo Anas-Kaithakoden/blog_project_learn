@@ -1,13 +1,17 @@
-from fastapi import FastAPI, HTTPException, Depends
-from pydantic import BaseModel, Field
+from fastapi import FastAPI, HTTPException, Depends, status
+from pydantic import BaseModel, Field, EmailStr
 from app import crud, security
-from typing import Optional
+from typing import Optional, Email
 from datetime import datetime
 from sqlalchemy.orm import Session
 from dependencies import get_db
 from datetime import timedelta
 
 app = FastAPI(title="Blog API")
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
 
 class UserCreate(BaseModel):
     name: str
@@ -63,15 +67,18 @@ def home():
         "message": "Welcome to Blog API"
     }
 
-@app.get("/login")
-def login(email: str, password: str, db: Session = Depends(get_db)):
-    user = crud.authenticate_user(email=email, password=password, session=db)
+@app.post("/login")
+def login(request= LoginRequest, db: Session = Depends(get_db)):
+    user = crud.authenticate_user(email=request.email, password=request.password, session=db)
     if user is None:
-        raise HTTPException(status_code=401, detail="Incorrect Email or password")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect Email or password")
     
-    token = security.create_access_token(data={"sub":str(user.id)}, expires_delta=timedelta(45))
+    token = security.create_access_token(data={"sub":str(user.id)}, expires_delta=timedelta(minutes=45))
 
-    return token
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }
 
 
 @app.post("/users")
