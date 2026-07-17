@@ -89,7 +89,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
     if not created_user:
         raise HTTPException(
-            status_code=409,
+            status_code=status.HTTP_409_CONFLICT,
             detail="Email already exists"
         )
     return created_user
@@ -120,10 +120,9 @@ def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db), c
         )
     return updated_user
 
-@app.delete("/users/{user_id}")
-def delete_user(user_id: int, db: Session = Depends(get_db)):
-    user = crud.delete_user(user_id, session=db)
-
+@app.delete("/users")
+def delete_user(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    user = crud.delete_user(current_user.id, session=db)
     if not user:
         raise HTTPException(
             status_code=404,
@@ -166,14 +165,14 @@ def view_post(post_id: int, db: Session = Depends(get_db)):
         )
     return post
 
-@app.patch("/posts")
-def update_post(post: PostUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    updated_post = crud.update_post(current_user.id, post.title, post.content, session=db)
+@app.patch("/posts/{post_id}")
+def update_post(post_id: int, post: PostUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    updated_post = crud.update_post(current_user.id, post_id,  post.title, post.content, session=db)
 
     if not updated_post:
         raise HTTPException(
             status_code=404,
-            detail="Post not found"
+            detail="Post not found or no permission to update"
         )
     return updated_post
 
@@ -184,7 +183,7 @@ def delete_post(post_id: int, db: Session = Depends(get_db), current_user: User 
     if not post:
         raise HTTPException(
             status_code=404,
-            detail="Post not found"
+            detail="Post not found or no permission to delete"
         )
     return post 
 
@@ -218,7 +217,7 @@ def update_comment(comment_id: int, comment: CommentUpdate, db: Session = Depend
     if not updated_comment:
         raise HTTPException(
             status_code=404,
-            detail="Comment not found"
+            detail="Comment not found or no permission to update"
         )
     return updated_comment
 
@@ -229,7 +228,7 @@ def delete_comment(comment_id: int, db: Session = Depends(get_db), current_user:
     if not comment:
         raise HTTPException(
             status_code=404,
-            detail="Comment not found"
+            detail="Comment not found or no permission to delete"
         )
     return comment 
 

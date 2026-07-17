@@ -72,8 +72,8 @@ def list_posts(session: Session):
 def view_post(post_id, session: Session):
     return session.scalar(select(Post).options(joinedload(Post.user)).where(Post.id == post_id))
         
-def update_post(post_id, new_title, new_content, session: Session):
-    post = session.scalar(select(Post).where(Post.id == post_id))
+def update_post(user_id, post_id, new_title, new_content, session: Session):
+    post = session.scalar(select(Post).where(Post.id == post_id, Post.user_id == user_id))
     if not post:
          return None
     if new_title is not None:
