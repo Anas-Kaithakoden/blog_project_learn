@@ -166,9 +166,9 @@ def view_post(post_id: int, db: Session = Depends(get_db)):
         )
     return post
 
-@app.patch("/posts/{post_id}")
-def update_post(post_id: int, post: PostUpdate, db: Session = Depends(get_db)):
-    updated_post = crud.update_post(post_id, post.title, post.content, session=db)
+@app.patch("/posts")
+def update_post(post: PostUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    updated_post = crud.update_post(current_user.id, post.title, post.content, session=db)
 
     if not updated_post:
         raise HTTPException(
@@ -178,8 +178,8 @@ def update_post(post_id: int, post: PostUpdate, db: Session = Depends(get_db)):
     return updated_post
 
 @app.delete("/posts/{post_id}")
-def delete_post(post_id: int, db: Session = Depends(get_db)):
-    post = crud.delete_post(post_id, session=db)
+def delete_post(post_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    post = crud.delete_post(current_user.id, post_id, session=db)
 
     if not post:
         raise HTTPException(
@@ -189,9 +189,9 @@ def delete_post(post_id: int, db: Session = Depends(get_db)):
     return post 
 
 # comments
-@app.post("/users/{user_id}/posts/{post_id}/comments")
-def add_comment(user_id: int, post_id: int, comment: CommentCreate, db: Session = Depends(get_db)):
-    created_comment = crud.add_comment(user_id, post_id, comment.comment, session=db)
+@app.post("/users/posts/{post_id}/comments")
+def add_comment(post_id: int, comment: CommentCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    created_comment = crud.add_comment(current_user.id, post_id, comment.comment, session=db)
 
     if not created_comment:
         raise HTTPException(
@@ -212,8 +212,8 @@ def view_comments(post_id: int, db: Session = Depends(get_db)):
     return post
 
 @app.patch("/comments/{comment_id}")
-def update_comment(comment_id: int, comment: CommentUpdate, db: Session = Depends(get_db)):
-    updated_comment = crud.update_comment(comment_id, comment.comment, session=db)
+def update_comment(comment_id: int, comment: CommentUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    updated_comment = crud.update_comment(current_user.id, comment_id, comment.comment, session=db)
 
     if not updated_comment:
         raise HTTPException(
@@ -223,8 +223,8 @@ def update_comment(comment_id: int, comment: CommentUpdate, db: Session = Depend
     return updated_comment
 
 @app.delete("/comments/{comment_id}")
-def delete_comment(comment_id: int, db: Session = Depends(get_db)):
-    comment = crud.delete_comment(comment_id, session=db)
+def delete_comment(comment_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    comment = crud.delete_comment(current_user.id, comment_id, session=db)
 
     if not comment:
         raise HTTPException(

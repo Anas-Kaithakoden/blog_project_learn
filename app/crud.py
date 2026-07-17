@@ -85,8 +85,8 @@ def update_post(post_id, new_title, new_content, session: Session):
     session.refresh(post)
     return post
         
-def delete_post(post_id, session: Session):
-    existing_post = session.scalar(select(Post).where(Post.id == post_id))
+def delete_post(user_id, post_id, session: Session):
+    existing_post = session.scalar(select(Post).where(Post.id == post_id, Post.user_id == user_id))
     if existing_post:
         session.delete(existing_post)
         session.commit()
@@ -112,8 +112,8 @@ def add_comment(user_id, post_id, comment, session: Session):
 def view_comments(post_id, session: Session):
     return session.scalars(select(Comment).where(Comment.post_id == post_id).options(joinedload(Comment.user), joinedload(Comment.post))).all()
 
-def update_comment(comment_id, new_comment, session: Session):
-    comment = session.scalar(select(Comment).where(Comment.id == comment_id)) 
+def update_comment(user_id, comment_id, new_comment, session: Session):
+    comment = session.scalar(select(Comment).where(Comment.id == comment_id, Comment.user_id == user_id)) 
     if not comment:
          return None
 
@@ -123,8 +123,8 @@ def update_comment(comment_id, new_comment, session: Session):
 
     return comment
 
-def delete_comment(comment_id, session: Session):
-    existing_comment = session.scalar(select(Comment).where(Comment.id == comment_id))
+def delete_comment(user_id , comment_id, session: Session):
+    existing_comment = session.scalar(select(Comment).where(Comment.id == comment_id, Comment.user_id == user_id))
     if existing_comment:
         session.delete(existing_comment)
         session.commit()
