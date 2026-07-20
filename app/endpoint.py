@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from pydantic import BaseModel, Field, EmailStr
 from app import crud, security
-from typing import Optional, Email
+from typing import Optional
 from datetime import datetime
 from sqlalchemy.orm import Session
-from dependencies import get_db, get_current_user
+from app.dependencies import get_db, get_current_user
 from datetime import timedelta
 from app.models import User
 
@@ -94,7 +94,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         )
     return created_user
 
-@app.get("/users")
+@app.get("/users", response_model=list[UserBasic])
 def list_users(db: Session = Depends(get_db)):
     return crud.list_users(session=db)
 
