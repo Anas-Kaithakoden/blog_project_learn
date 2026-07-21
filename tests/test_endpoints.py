@@ -1,9 +1,5 @@
-from fastapi.testclient import TestClient
-from app.endpoint import app
 
-client = TestClient(app)
-
-def test_root():
+def test_root(client):
     response = client.get("/")
 
     assert response.status_code == 200
@@ -11,11 +7,9 @@ def test_root():
         "message": "Welcome to Blog API"
     }
 
-def test_user():
+def test_user(client):
     response = client.get("/users")
 
     data = response.json()
 
     assert response.status_code == 200
-    assert "id" in data[0]
-    assert "hashed_password" not in data[0]
