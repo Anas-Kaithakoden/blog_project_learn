@@ -46,6 +46,10 @@ class UserBasic(BaseModel):
         "from_attributes": True
     }
 
+class UserCreateResponse(BaseModel):
+    name: str
+    email: str
+
 class PostResponse(BaseModel):
     id: int
     title: str
@@ -82,7 +86,7 @@ def login(request= LoginRequest, db: Session = Depends(get_db)):
     }
 
 
-@app.post("/users")
+@app.post("/users", response_model=UserCreateResponse, status_code=status.HTTP_201_CREATED)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
     created_user = crud.create_user(name=user.name, email=user.email, password=user.password, phone=user.phone, session=db)
