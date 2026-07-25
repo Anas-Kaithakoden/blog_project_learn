@@ -73,7 +73,7 @@ def home():
     }
 
 @app.post("/login")
-def login(request= LoginRequest, db: Session = Depends(get_db)):
+def login(request: LoginRequest, db: Session = Depends(get_db)):
     user = crud.authenticate_user(email=request.email, password=request.password, session=db)
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect Email or password")
@@ -137,7 +137,7 @@ def delete_user(db: Session = Depends(get_db), current_user: User = Depends(get_
 
 # posts
 
-@app.post("/posts")
+@app.post("/posts", response_model=PostResponse, status_code=status.HTTP_201_CREATED)
 def create_post(post: PostCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
 
     created_post = crud.create_post(current_user.id , post.title, post.content, post.published, session=db)
@@ -180,7 +180,7 @@ def update_post(post_id: int, post: PostUpdate, db: Session = Depends(get_db), c
         )
     return updated_post
 
-@app.delete("/posts/{post_id}")
+@app.delete("/posts/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(post_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     post = crud.delete_post(current_user.id, post_id, session=db)
 

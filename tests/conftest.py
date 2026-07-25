@@ -73,6 +73,46 @@ def apply_migrations():
 
     yield
 
+payload = {
+    "name": "anas",
+    "email": "anas@testt.com",
+    "password": "secret123",
+    "phone": "+91744355654",
+}
+
+@pytest.fixture
+def user(client):
+    response = client.post("/users", json=payload,)
+    return response.json()
+
+@pytest.fixture
+def access_token(client, user):
+    response = client.post("/login", json={
+        "email": payload["email"],
+        "password": payload["password"]
+    },
+    )
+    return response.json()["access_token"]
+
+@pytest.fixture
+def auth_headers(access_token):
+    return {
+        "Authorization": f"Bearer {access_token}"
+    }
+
+@pytest.fixture
+def post(client, auth_headers):
+    response = client.post(
+        "/posts",
+        json={
+            "title": "Test Post",
+            "content": "Hello",
+            "published": True,
+        },
+        headers=auth_headers,
+    )
+
+    return response.json()
 
 # Test execution flow:
 #
