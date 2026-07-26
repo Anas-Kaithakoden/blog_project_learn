@@ -73,23 +73,56 @@ def apply_migrations():
 
     yield
 
-payload = {
-    "name": "anas",
-    "email": "anas@testt.com",
-    "password": "secret123",
-    "phone": "+91744355654",
-}
+@pytest.fixture
+def user_payload():
+    return {
+        "name": "anas",
+        "email": "anas@test.com",
+        "password": "secret123",
+        "phone": "+91744355654",
+    }
 
 @pytest.fixture
-def user(client):
-    response = client.post("/users", json=payload,)
+def another_user_payload():
+    return {
+        "name": "jack",
+        "email": "jack@test.com",
+        "password": "secret12f3",
+        "phone": "+9174453654",
+    }
+
+@pytest.fixture
+def post_payload():
+    return {
+        "title": "My First Post",
+        "content": "Hello World",
+        "published": True
+    }
+
+@pytest.fixture
+def user(client, user_payload):
+    response = client.post("/users", json=user_payload,)
     return response.json()
 
 @pytest.fixture
-def access_token(client, user):
+def another_user(client, another_user_payload):
+    response = client.post("/users", json=another_user_payload,)
+    return response.json()
+
+@pytest.fixture
+def access_token(client, user, user_payload):
     response = client.post("/login", json={
-        "email": payload["email"],
-        "password": payload["password"]
+        "email": user_payload["email"],
+        "password": user_payload["password"]
+    },
+    )
+    return response.json()["access_token"]
+
+@pytest.fixture
+def another_access_token(client, another_user, another_user_payload):
+    response = client.post("/login", json={
+        "email": another_user_payload["email"],
+        "password": another_user_payload["password"]
     },
     )
     return response.json()["access_token"]
@@ -99,6 +132,13 @@ def auth_headers(access_token):
     return {
         "Authorization": f"Bearer {access_token}"
     }
+
+@pytest.fixture
+def another_auth_headers(another_access_token):
+    return {
+        "Authorization": f"Bearer {another_access_token}"
+    }
+
 
 @pytest.fixture
 def post(client, auth_headers):
@@ -113,6 +153,21 @@ def post(client, auth_headers):
     )
 
     return response.json()
+
+@pytest.fixture
+def another_post(client, another_auth_headers):
+    response = client.post(
+        "/posts",
+        json={
+            "title": "Test 2 Post",
+            "content": "Hello",
+            "published": True,
+        },
+        headers=another_auth_headers,
+    )
+
+    return response.json()
+
 
 # Test execution flow:
 #

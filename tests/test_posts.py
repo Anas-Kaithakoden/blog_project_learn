@@ -1,12 +1,6 @@
 from app.models import Post
 
-post_payload = {
-        "title": "My First Post",
-        "content": "Hello World",
-        "published": True
-    }
-
-def test_create_post_success(client, auth_headers, db_session):
+def test_create_post_success(client,post_payload, auth_headers, db_session):
     responce = client.post("/posts", json=post_payload, headers=auth_headers,)
 
     assert responce.status_code == 201
@@ -20,7 +14,7 @@ def test_create_post_success(client, auth_headers, db_session):
 
     assert post is not None
 
-def test_create_post_without_token(client):
+def test_create_post_without_token(client, post_payload):
     response = client.post("/posts", json=post_payload)
 
     assert response.status_code == 401
@@ -48,4 +42,4 @@ def test_delete_post_success(client, auth_headers, post, db_session):
 
     assert response.status_code == 204
 
-    assert (db_session.query(Post).where(id == post['id']).first() is None )
+    assert (db_session.query(Post).where(Post.id == post['id']).first() is None )
