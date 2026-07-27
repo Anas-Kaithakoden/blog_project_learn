@@ -52,11 +52,22 @@ def test_delete_post_of_user(client, auth_headers, post):
 
     assert response.status_code == 204
 
-def test_delete_post_of_another_user(client, another_post, auth_headers,):
-    # Create a new user
-    response = client.delete(f"/posts/{another_post['id']}", headers=auth_headers)
+
+def test_delete_other_users_post(client,post_payload, auth_factory):
+
+    owner = auth_factory(email="owner@test.com")
+    attacker = auth_factory(email="attacker@test.com")
+
+    post = client.post(
+        "/posts",
+        json=post_payload,
+        headers=owner["headers"],
+    ).json()
+
+    response = client.delete(
+        f"/posts/{post['id']}",
+        headers=attacker["headers"],
+    )
 
     assert response.status_code == 404
-
-
     

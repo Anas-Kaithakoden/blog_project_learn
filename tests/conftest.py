@@ -82,14 +82,6 @@ def user_payload():
         "phone": "+91744355654",
     }
 
-@pytest.fixture
-def another_user_payload():
-    return {
-        "name": "jack",
-        "email": "jack@test.com",
-        "password": "secret12f3",
-        "phone": "+9174453654",
-    }
 
 @pytest.fixture
 def post_payload():
@@ -104,10 +96,6 @@ def user(client, user_payload):
     response = client.post("/users", json=user_payload,)
     return response.json()
 
-@pytest.fixture
-def another_user(client, another_user_payload):
-    response = client.post("/users", json=another_user_payload,)
-    return response.json()
 
 @pytest.fixture
 def access_token(client, user, user_payload):
@@ -118,27 +106,12 @@ def access_token(client, user, user_payload):
     )
     return response.json()["access_token"]
 
-@pytest.fixture
-def another_access_token(client, another_user, another_user_payload):
-    response = client.post("/login", json={
-        "email": another_user_payload["email"],
-        "password": another_user_payload["password"]
-    },
-    )
-    return response.json()["access_token"]
 
 @pytest.fixture
 def auth_headers(access_token):
     return {
         "Authorization": f"Bearer {access_token}"
     }
-
-@pytest.fixture
-def another_auth_headers(another_access_token):
-    return {
-        "Authorization": f"Bearer {another_access_token}"
-    }
-
 
 @pytest.fixture
 def post(client, auth_headers):
@@ -154,19 +127,39 @@ def post(client, auth_headers):
 
     return response.json()
 
-@pytest.fixture
-def another_post(client, another_auth_headers):
-    response = client.post(
-        "/posts",
-        json={
-            "title": "Test 2 Post",
-            "content": "Hello",
-            "published": True,
-        },
-        headers=another_auth_headers,
-    )
 
-    return response.json()
+@pytest.fixture
+def auth_factory(client, user_payload):
+
+    def create_auth_user(**kwargs):
+        payload = user_payload
+        payload.update(kwargs)
+
+        # Create user
+        response = client.post("/users", json=payload)
+        user = response.json()
+
+        # Login
+        response = client.post(
+            "/login",
+            json={
+                "email": payload["email"],
+                "password": payload["password"],
+            },
+        )
+
+        token = response.json()["access_token"]
+
+        return {
+            "user": user,
+            "token": token,
+            "headers": {
+                "Authorization": f"Bearer {token}"
+            },
+            "payload": payload,
+        }
+
+    return create_auth_user
 
 
 # Test execution flow:
