@@ -1,5 +1,5 @@
 # blog_project_learn
-Documenting the journey of me making a blog management system (CLI)
+Documenting the journey of me making a blog management system (CLI) -> REST APIs
 
 ## Features
 - Can create users
@@ -14,6 +14,8 @@ PostgreSQL
 SQLalchemy ORM
 Psycopg
 Alembic
+Pytest
+docker
 
 ## Project structure
 blog_project_learn/
@@ -23,12 +25,28 @@ blog_project_learn/
 │   ├── models.py
 │   ├── crud.py
 │   ├── menu.py
-│   └── main.py
+│   ├── main.py
+│   ├── endpoint.py
+│   ├── security.py
+│   └── dependencies.py
+│ 
+├── tests/
+│   ├── conftest.py
+│   ├── test_auth.py
+│   ├── test_endpoints.py
+│   ├── tests_users.py
+│   └── test_posts.py
 │
+│ 
 ├── alembic/
+│   └── env.py
 │
 ├── alembic.ini
 │
 ├── requirements.txt
+│
+├── Dockerfile
+│
+├── docker-compose.yml
 │
 └── README.md

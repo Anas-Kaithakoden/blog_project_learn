@@ -23,9 +23,6 @@ services:
 
   api:
     build: .
-    env_file:
-      - .env
-      - tests/.env.test  
     environment:
       DB_HOST: db
       DB_USER: ${DB_USER}
@@ -33,6 +30,7 @@ services:
       DB_NAME: ${DB_NAME}
       DATABASE_URL: postgresql+psycopg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
       TEST_DATABASE_URL: postgresql+psycopg://postgres:123@test_db:5432/blog_test_db
+      SECRET_KEY : ${SECRET_KEY}
 
     volumes:
       - .:/app
