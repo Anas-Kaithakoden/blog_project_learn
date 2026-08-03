@@ -12,13 +12,14 @@ from alembic import command
 from alembic.config import Config
 
 # Connect to Test database
-load_dotenv("tests/.env.test", override=True)
+load_dotenv("tests/.env.test")
 
+DB_HOST = os.getenv("DB_HOST")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_NAME = os.getenv("DB_NAME")
 
-TEST_DATABASE_URL = f"postgresql+psycopg://{DB_USER}:{DB_PASSWORD}@localhost:5432/{DB_NAME}"
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 
 engine = create_engine(TEST_DATABASE_URL)
 
