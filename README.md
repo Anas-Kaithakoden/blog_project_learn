@@ -12,6 +12,7 @@ Documenting the journey of me making a blog management system (CLI) -> REST APIs
 Python
 PostgreSQL
 SQLalchemy ORM
+FastAPI
 Psycopg
 Alembic
 Pytest
