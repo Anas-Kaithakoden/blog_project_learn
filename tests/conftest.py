@@ -14,10 +14,6 @@ from alembic.config import Config
 # Connect to Test database
 load_dotenv("tests/.env.test")
 
-DB_HOST = os.getenv("DB_HOST")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_NAME = os.getenv("DB_NAME")
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 

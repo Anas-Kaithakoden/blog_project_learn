@@ -15,10 +15,12 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+
+
 database_url = config.get_main_option("sqlalchemy.url")
 
 if not database_url:
-    DATABASE_URL = f"postgresql+psycopg://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:5432/{os.getenv('DB_NAME')}"
+    DATABASE_URL = os.getenv("DATABASE_URL")
     config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 # Interpret the config file for Python logging.
