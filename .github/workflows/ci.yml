@@ -1,6 +1,9 @@
 name : Blog API ci
 
 env:
+  DB_NAME: ${{ secrets.DB_NAME }}
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
   TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
   SECRET_KEY: ${{ secrets.SECRET_KEY }}
@@ -65,14 +68,17 @@ jobs:
     - name: Get short SHA
       run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
+    - name: Set lowercase owner
+      run: echo "OWNER=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
+
     - name: Build docker image
       run: |
         docker build \
-          -t ghcr.io/${{ github.repository }}/blog-api:latest \
-          -t ghcr.io/${{ github.repository }}/blog-api:$SHORT_SHA \
+          -t ghcr.io/$OWNER/blog-api:latest \
+          -t ghcr.io/$OWNER/blog-api:$SHORT_SHA \
           .
   
     - name: Push image
       run: |
-        docker push ghcr.io/${{ github.repository }}/blog-api:latest
-        docker push ghcr.io/${{ github.repository }}/blog-api:$SHORT_SHA
+        docker push ghcr.io/$OWNER/blog-api:latest
+        docker push ghcr.io/$OWNER/blog-api:$SHORT_SHA
